@@ -1,0 +1,5 @@
+(define (square x) (* x x))
+(define (largest x y) (if (> x y) x y))
+(define (sum-of-squares a b c) 
+  (+ (square (largest a b))
+     (square (largest b c))))
