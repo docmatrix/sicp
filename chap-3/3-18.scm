@@ -20,3 +20,5 @@
 	       (set! seen (cons list seen))
 	       (inner (cdr list))))))
     (inner x)))
+
+; CORRECT

@@ -4,3 +4,4 @@
 ; acc2 is an alias for dispatch in E2, with balance set to 100.
 ; The local accounts are kept distinct, because each call to make-account sets up a new environment. I don't believe anything is shared if we take the pure view, but the text does refer to sharing procedure code depending on 
 ; implementation.
+; CORRECT
