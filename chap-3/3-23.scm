@@ -25,7 +25,6 @@
 	   (set-last-ptr! q new-item)
 	   q)
 	  (else
-	   (display (front-deque q)) (newline)
 	   (set-prev! new-item (front-ptr q))
 	   (set-front-ptr! q new-item)
 	   q))))
@@ -39,20 +38,36 @@
 	   (set-next! (last-ptr q) new-item)
 	   (set-last-ptr! q new-item)
 	   q))))
-(define (print-queue x)
+
+(define (print-queue q)
   (define (print-list l)
-    (display (data x))
-    (if (null? (next x))
+    (display (data l))
+    (if (null? (next l))
 	(newline)
-	(print-list (next x))))
-  (print-list (front-ptr x)))
+	(print-list (next l))))
+  (print-list (front-ptr q)))
 
-(define (front-delete-deque! x)
-  (set-front-ptr! x (cdr (front-ptr x)))
-  )
-;(define (rear-delete-deque! x)
-;  )
-
+(define (front-delete-deque! q)
+  (let ((first-item (front-ptr q)))
+    (let ((next-item (next first-item)))
+      (if (null? next-item)
+	  (begin
+	    (set-front-ptr! q '())
+	    (set-last-ptr! q '()))
+	  (begin
+	    (set-prev! next-item '())
+	    (set-front-ptr! q next-item))))))
+(define (rear-delete-deque! q)
+  (let ((last-item (last-ptr q)))
+    (let ((prev-last-item (prev last-item)))
+      (if (null? prev-last-item)
+	  (begin
+	    (set-front-ptr! q '())
+	    (set-last-ptr! q '()))
+	  (begin
+	    (set-next! prev-last-item '())
+	    (set-last-ptr! q prev-last-item))))))
+  
 (define q1 (make-deque))
 (display (empty-deque? q1)) (newline) ; #t
 (front-insert-deque! q1 'b)
@@ -64,12 +79,13 @@
 (print-queue q1)                      ; (a b c d)
 (display (front-deque q1)) (newline)  ; a
 (display (rear-deque q1)) (newline)   ; d
-;(rear-delete-deque! q1))
-;(rear-delete deque! q1))
-;(print-queue q1)                      ; (a b)
-;(front-delete-deque q1)
-;(display (front-deque q1)) (newline)  ; (b)
-;(display (rear-deque q1))  (newline)  ; (b)
-;(front-delete q1)
-;(print-queue q1)                      ; ()
-;(display (empty-deque? q1)) (newline)  ; #t
+(rear-delete-deque! q1)
+(rear-delete-deque! q1)
+(print-queue q1)                      ; (a b)
+(front-delete-deque! q1)
+(display (front-deque q1)) (newline)  ; (b)
+(display (rear-deque q1))  (newline)  ; (b)
+(front-delete-deque! q1)
+(display (empty-deque? q1)) (newline)  ; #t
+
+; CORRECT. Could do with more error checking, but it's correct!
