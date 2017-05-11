@@ -56,7 +56,22 @@
   (newline)
   (display x))
 
+(define (add-streams s1 s2)
+  (stream-map + s1 s2))
+
 (define ones (cons-stream 1 ones))
 
 (define integers
   (cons-stream 1 (add-streams ones integers)))
+
+(define (partial-sum s)
+  (cons-stream (stream-car s)
+	       (add-streams (stream-cdr s)
+			    (partial-sum s))))
+
+(define (show-stream s n)
+  (if (zero? n)
+      (display-line "done")
+      (begin
+	(display (stream-car s)) (newline)
+	(show-stream (stream-cdr s) (- n 1) ))))
