@@ -1,7 +1,18 @@
-(use-modules (ice-9 syncase))
+;(use-modules (ice-9 syncase))
+;(define-syntax cons-stream
+;  (syntax-rules ()
+;    ((_ head tail) (cons head (delay tail))) ))
+
+;(defmacro cons-stream (a b)
+;  `(cons ,a (delay ,b)))
+
+
+(use-syntax (ice-9 syncase))  ; this is currently needed for R5RS macros to work in Guile
+
 (define-syntax cons-stream
   (syntax-rules ()
-    ((_ head tail) (cons head (delay tail))) ))
+    ((_ ?car ?cdr) (cons ?car (delay ?cdr)))))
+
 
 (define (stream-car stream) (car stream))
 (define (stream-cdr stream) (force (cdr stream)))
@@ -75,3 +86,19 @@
       (begin
 	(display (stream-car s)) (newline)
 	(show-stream (stream-cdr s) (- n 1) ))))
+
+(define (interleave s1 s2)
+  (if (null? s1)
+      s2
+      (cons-stream
+       (stream-car s1)
+       (interleave s2 (stream-cdr s1)))))
+
+(define (pairs s t)
+  (cons-stream
+   (list (stream-car s) (stream-car t))
+   (interleave
+    (stream-map (lambda (x)
+		  (list (stream-car s) x))
+		(stream-cdr t))
+    (pairs (stream-cdr s) (stream-cdr t)))))
