@@ -1,3 +1,5 @@
+#lang racket
+
 ;(use-modules (ice-9 syncase))
 ;(define-syntax cons-stream
 ;  (syntax-rules ()
@@ -7,7 +9,7 @@
 ;  `(cons ,a (delay ,b)))
 
 
-(use-syntax (ice-9 syncase))  ; this is currently needed for R5RS macros to work in Guile
+; (use-syntax (ice-9 syncase))  ; this is currently needed for R5RS macros to work in Guile
 
 (define-syntax cons-stream
   (syntax-rules ()
@@ -103,7 +105,6 @@
 		(stream-cdr t))
     (pairs (stream-cdr s) (stream-cdr t)))))
 
-
 (define (scale-stream stream factor)
   (stream-map
    (lambda (x) (* x factor))
@@ -117,3 +118,7 @@
                   int)))
   int)
 
+(define (RC R C dt)
+  (lambda (i v0)
+    (add-streams iR 
+    ))
