@@ -24,6 +24,22 @@
   (check (run '(cond (true true) (else false))) => true)
   (check (run '(cond ((= 5 6) false) ((= 4 5) false) ((= 51 5) false) (else (= 1 1)))) => true)
   (check (run '(cond ((= 5 6) false) ((= 4 5) false) ((= 5 5) true) (else false))) => true)
+  (check (run '(cond (10 => (lambda (x) (+ x 5))) (else false))) => 15)
+  (check (run '(cond ((assoc 'b '((a 1) (b 2))) => cadr) (else false))) => 2)
+  (check (run '(cond ((assoc 'z '((a 1) (b 2))) => cadr) (else false))) => false)
+
+  ; Check and / or
+  (check (run '(and true true true)) => true)
+  (check (run '(and true false true)) => false)
+  (check (run '(and false false false)) => false)
+  (check (run '(and 1 2 3)) => true)
+  (check (run '(and 1 2 false)) => false)
+  (check (run '(or true true true)) => true)
+  (check (run '(or true false true)) => true)
+  (check (run '(or false false false)) => false)
+  (check (run '(or false false false)) => false)
+  (check (run '(or 1 2 3)) => true)
+  (check (run '(or 1 2 false)) => true)
 
   ; Check variables
   (run '(define joe 12))
@@ -58,6 +74,23 @@
   (check (run '(rsum 5 6)) => 11)
   (check (run '(rsum 0 6)) => 6)
   (check (run '(rsum 6 0)) => 6)
+
+  ; Returned functions
+  (run '(define (make-adder-func x) (lambda (y) (+ x y))))
+  (run '(define add2 (make-adder-func 2)))
+  (check (run '(add2 xx)) => 12)
+  (check (run '((make-adder-func 4) 10)) => 14)
+
+  ; Function params
+  (run '(define (apply-twice func val) (func (func val))))
+  (check (run '(apply-twice add2 100)) => 104)
+  (check (run '(apply-twice (lambda (x) (* x x)) 10)) => 10000)
+
+  (run '(define (compose f g) (lambda (x) (f (g x)))))
+  (run '(define (square x) (* x x)))
+  (run '(define (inc x) (+ x 1)))
+  (check (run '((compose square inc) 10)) => 121)
+  (check (run '((compose inc square) 10)) => 101)
 
   (check-report)
   (check-reset!)

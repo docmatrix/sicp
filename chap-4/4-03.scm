@@ -22,7 +22,6 @@
 (put-syntax! 'begin (lambda (exp env) (eval-sequence (begin-actions exp) env)))
 (put-syntax! 'if (lambda (exp env) (eval-if exp env)))
 (put-syntax! 'cond (lambda (exp env)(eval (cond->if exp) env)))
+; CORRECT
 
-(load "tests.scm")
-(run-tests)
 

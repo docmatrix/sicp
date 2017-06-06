@@ -305,6 +305,7 @@
 
 (define primitive-procedures
   (list (list 'car car)
+        (list 'cadr cadr)
         (list 'cdr cdr)
         (list 'cons cons)
         (list 'null? null?)
@@ -313,6 +314,7 @@
         (list '- -)
         (list '* *)
         (list '/ /)
+        (list 'assoc assoc)
 ;;      more primitives
         ))
 

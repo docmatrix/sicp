@@ -100,7 +100,6 @@
 ; -- reporting --
 
 (define (check:report-expression expression)
-  (newline)
   (check:write expression)
   (display " => "))
 
