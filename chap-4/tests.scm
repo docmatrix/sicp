@@ -96,6 +96,21 @@
   (check (run '(let ((a 2) (b 3)) (+ a b))) => 5)
   (check (run '(let ((a 2)) (let ((b (square 5))) (+ a b)))) => 27) 
   (check (run '(let* ((x 3) (y (+ x 2)) (z (+ x y 5))) (* x z))) => 39)
+  (run '(define t 0))
+  (run '(let ((a 4) (b 3))
+          (set! t (* (+ t 4) (- b t))) t))
+  (check (run 't) => 12) 
+
+  ; Named Let
+  (run '(define (fib n)
+          (let fib-iter ((a 1) (b 0) (count n))
+            (if (= count 0) b (fib-iter (+ a b) a (- count 1))))))
+  (check (run '(fib 10)) => 55)
+
+  ; While
+  (run '(define x 0))
+  (run '(let ((n 10)) (while (> n x) (set! x (+ x 1))) x))
+  (check (run 'x) => 10)
 
   (check-report)
   (check-reset!)

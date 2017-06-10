@@ -314,6 +314,7 @@
         (list '- -)
         (list '* *)
         (list '/ /)
+        (list '> >)
         (list 'assoc assoc)
 ;;      more primitives
         ))
