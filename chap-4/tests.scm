@@ -92,6 +92,11 @@
   (check (run '((compose square inc) 10)) => 121)
   (check (run '((compose inc square) 10)) => 101)
 
+  ; Let
+  (check (run '(let ((a 2) (b 3)) (+ a b))) => 5)
+  (check (run '(let ((a 2)) (let ((b (square 5))) (+ a b)))) => 27) 
+  (check (run '(let* ((x 3) (y (+ x 2)) (z (+ x y 5))) (* x z))) => 39)
+
   (check-report)
   (check-reset!)
 )

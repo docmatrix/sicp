@@ -68,6 +68,41 @@
                           (sequence->exp (cond-actions first))
                           (expand-clauses rest)))))))
 
+; ---- Exercise 4.06 ----
+(define (let-decls exp) (cadr exp))
+(define (let-body exp) (caddr exp))
+(define (let-var decl) (car decl))
+(define (let-exp decl) (cadr decl))
+(define (let-vars decls)
+  (if (null? decls)
+      '()
+      (cons (let-var (car decls))
+            (let-vars (cdr decls)))))
+(define (let-exps decls)
+  (if (null? decls)
+      '()
+      (cons (let-exp (car decls))
+            (let-exps (cdr decls)))))
+(define (let->lambda exp)
+  (let ((vars (let-vars (let-decls exp)))
+        (body (list (let-body exp)))
+        (exps (let-exps (let-decls exp))))
+    (cons (make-lambda vars body) exps)))
+(put-syntax! 'let (lambda (exp env) (eval (let->lambda exp) env)))
+; CORRECT
+
+; ---- Exercise 4.07 ----
+(define (make-let decls body)
+  (list 'let decls body)) 
+(define (let*->nested-lets exp)
+  (define (nested-let decls body)
+    (if (null? decls)
+        body
+        (make-let (list (car decls)) (nested-let (cdr decls) body))))
+  (nested-let (let-decls exp) (let-body exp)))
+
+(put-syntax! 'let* (lambda (exp env) (eval (let*->nested-lets exp) env)))
+
 
 (load "tests.scm")
 (run-tests)
