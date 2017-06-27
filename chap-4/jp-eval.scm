@@ -1,4 +1,4 @@
-(load "ch4-mceval.scm")
+(load "support/ch4-mceval.scm")
 
 ; ---- Exercise 4.03 ----
 (use-modules (syntax-table))
