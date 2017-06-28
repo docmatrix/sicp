@@ -112,6 +112,12 @@
   (run '(let ((n 10)) (while (> n x) (set! x (+ x 1))) x))
   (check (run 'x) => 10)
 
+  ; make-unbound
+  (run '(define deleteme 5))
+  (check (run 'deleteme) => 5)
+  (run '(make-unbound! deleteme))
+  ; (check (run 'deleteme) => 5) difficult to test due to error, but it works.
+
   (check-report)
   (check-reset!)
 )

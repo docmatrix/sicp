@@ -158,6 +158,37 @@
             (set-car! env (list (list var val)))
             (add-binding-to-frame! var val frame)))))
 
+; ---- Exercise 4.12 ----
+(define (find-var var env)
+  (define (env-loop env)
+    (if (eq? env the-empty-environment)
+        (error "Unbound variable" var))
+    (let* ((frame (first-frame env))
+           (lookup-val (assoc var frame)))
+      (if lookup-val
+          lookup-val
+          (env-loop (enclosing-environment env)))))
+  (env-loop env))
+
+(define (set-variable-value! var val env)
+  (set-cdr! (find-var var env) (list val)))
+(define (lookup-variable-value var env)
+  (cadr (find-var var env)))
+
+; ---- Exercise 4.13 ----
+(define (make-unbound! var env)
+  ; Only unbind from the current frame 
+  ; as we don't own the caller.
+  (let* ((frame (first-frame env))
+         (filtered (filter (lambda (x) (not (eq? var (car x)))) frame)))
+    ;(display filtered) (newline)
+    (set-car! frame (car filtered))
+    (set-cdr! frame (cdr filtered))))
+
+(define (eval-unbind exp env)
+  (make-unbound! (definition-variable exp) env)
+  'ok)
+(put-syntax! 'make-unbound! (lambda (exp env) (eval-unbind exp env)))
 
 (load "tests.scm")
 (run-tests)
