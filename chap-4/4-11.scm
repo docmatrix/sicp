@@ -1,0 +1,37 @@
+; ---- Exercise 4.11 ----
+(define (make-frame variables values) (map list variables values))
+(define (frame-variables frame) (map car frame))
+(define (frame-values frame) (map cadr frame))
+(define (add-binding-to-frame! var val frame)
+  (set-cdr! frame (cons (car frame) (cdr frame)))
+  (set-car! frame (list var val)))
+(define (lookup-variable-value var env)
+  (define (env-loop env)
+    (if (eq? env the-empty-environment)
+        (error "Unbound variable" var))
+    (let* ((frame (first-frame env))
+           (lookup-val (assoc var frame)))
+      (if lookup-val
+          (cadr lookup-val)
+          (env-loop (enclosing-environment env)))))
+  (env-loop env))
+(define (set-variable-value! var val env)
+  (define (env-loop env)
+    (if (eq? env the-empty-environment)
+        (error "Unbound variable: SET!" var))
+    (let* ((frame (first-frame env))
+           (lookup-val (assoc var frame)))
+      (if lookup-val
+          (set-cdr! lookup-val (list val))
+          (env-loop (enclosing-environment env)))))
+  (env-loop env))
+(define (define-variable! var val env)
+  (let* ((frame (first-frame env))
+         (lookup-val (assoc var frame)))
+    (if lookup-val
+        (set-cdr! lookup-val val)
+        (if (null? frame)
+            (set-car! env (list (list var val)))
+            (add-binding-to-frame! var val frame)))))
+
+; CORRECT
