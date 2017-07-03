@@ -46,16 +46,16 @@
          (eval-sequence (begin-actions exp) env))
         ((cond? exp) (eval (cond->if exp) env))
         ((application? exp)             ; clause from book
-         (apply (actual-value (operator exp) env)
-                (operands exp)
-                env))
+         (apply-jp (actual-value (operator exp) env)
+                   (operands exp)
+                   env))
         (else
          (error "Unknown expression type -- EVAL" exp))))
 
 (define (actual-value exp env)
   (force-it (eval exp env)))
 
-(define (apply procedure arguments env)
+(define (apply-jp procedure arguments env)
   (cond ((primitive-procedure? procedure)
          (apply-primitive-procedure
           procedure
@@ -65,7 +65,7 @@
           (procedure-body procedure)
           (extend-environment
            (procedure-parameters procedure)
-           (list-of-delayed-args arguments env) ; changed
+           (list-of-delayed-args (procedure-parameters procedure) arguments env) ; changed
            (procedure-environment procedure))))
         (else
          (error
@@ -85,7 +85,7 @@
             (list-of-delayed-args (rest-operands exps)
                                   env))))
 
-(define (eval-if exp env)
+(define (eval-if-t exp env)
   (if (true? (actual-value (if-predicate exp) env))
       (eval (if-consequent exp) env)
       (eval (if-alternative exp) env)))

@@ -24,24 +24,6 @@
   (check (run '(cond (true true) (else false))) => true)
   (check (run '(cond ((= 5 6) false) ((= 4 5) false) ((= 51 5) false) (else (= 1 1)))) => true)
   (check (run '(cond ((= 5 6) false) ((= 4 5) false) ((= 5 5) true) (else false))) => true)
-  (check (run '(cond (10 => (lambda (x) (+ x 5))) (else false))) => 15)
-  (check (run '(cond ((assoc 'b '((a 1) (b 2))) => cadr) (else false))) => 2)
-  (check (run '(cond ((assoc 'z '((a 1) (b 2))) => cadr) (else false))) => false)
-  (check (run '(unless (= 4 5) false 1)) => false)
-  (check (run '(unless (= 5 5) false 1)) => 1)
-
-  ; Check and / or
-  (check (run '(and true true true)) => true)
-  (check (run '(and true false true)) => false)
-  (check (run '(and false false false)) => false)
-  (check (run '(and 1 2 3)) => true)
-  (check (run '(and 1 2 false)) => false)
-  (check (run '(or true true true)) => true)
-  (check (run '(or true false true)) => true)
-  (check (run '(or false false false)) => false)
-  (check (run '(or false false false)) => false)
-  (check (run '(or 1 2 3)) => true)
-  (check (run '(or 1 2 false)) => true)
 
   ; Check variables
   (run '(define joe 12))
@@ -71,12 +53,6 @@
   (run '(set! lsum (lambda (x y) (- x y ))))
   (check (run '(lsum 11 12)) => -1)
 
-  ; Check recursives
-  (run '(define (rsum x y) (if (= y 0) x (rsum (+ x 1) (- y 1)))))
-  (check (run '(rsum 5 6)) => 11)
-  (check (run '(rsum 0 6)) => 6)
-  (check (run '(rsum 6 0)) => 6)
-
   ; Returned functions
   (run '(define (make-adder-func x) (lambda (y) (+ x y))))
   (run '(define add2 (make-adder-func 2)))
@@ -94,36 +70,16 @@
   (check (run '((compose square inc) 10)) => 121)
   (check (run '((compose inc square) 10)) => 101)
 
-  ; Let
-  (check (run '(let ((a 2) (b 3)) (+ a b))) => 5)
-  (check (run '(let ((a 2)) (let ((b (square 5))) (+ a b)))) => 27) 
-  (check (run '(let* ((x 3) (y (+ x 2)) (z (+ x y 5))) (* x z))) => 39)
-  (run '(define t 0))
-  (run '(let ((a 4) (b 3))
-          (set! t (* (+ t 4) (- b t))) t))
-  (check (run 't) => 12) 
+  ; Thunks
+  (run '(define (try a b) (if (= a 0) 1 b)))
+  (check (run '(try 0 (/ 1 0))) => 1)
 
-  ; Named Let
-  (run '(define (fib n)
-          (let fib-iter ((a 1) (b 0) (count n))
-            (if (= count 0) b (fib-iter (+ a b) a (- count 1))))))
-  (check (run '(fib 10)) => 55)
-
-  ; While
-  (run '(define x 0))
-  (run '(let ((n 10)) (while (> n x) (set! x (+ x 1))) x))
-  (check (run 'x) => 10)
-
-  ; make-unbound
-  (run '(define deleteme 5))
-  (check (run 'deleteme) => 5)
-  (run '(make-unbound! deleteme))
-  ; (check (run 'deleteme) => 5) difficult to test due to error, but it works.
- 
-  (run '(define (body) (define x 1) (+ x y) (define y 2)))
-  (check (run '(body)) => 3)
-
-  (check (run '(letrec ((fact (lambda (n) (if (= n 1) 1 (* n (fact (- n 1))))))) (fact 10))) => 3628800)
+  (run '(define count 0))
+  (run '(define (id x) (set! count (+ count 1)) x))
+  (run '(define w (id (id 10))))
+  (check (run 'count) => 1)
+  (check (run '(if w w false)) => '(evaluated-thunk 10))
+  (check (run 'count) => 2)
 
   (check-report)
   (check-reset!)

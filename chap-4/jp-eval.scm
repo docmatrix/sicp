@@ -181,7 +181,6 @@
   ; as we don't own the caller.
   (let* ((frame (first-frame env))
          (filtered (filter (lambda (x) (not (eq? var (car x)))) frame)))
-    ;(display filtered) (newline)
     (set-car! frame (car filtered))
     (set-cdr! frame (cdr filtered))))
 
@@ -190,5 +189,57 @@
   'ok)
 (put-syntax! 'make-unbound! (lambda (exp env) (eval-unbind exp env)))
 
+; ---- Exercise 4.16 ----
+(define (lookup-variable-value var env)
+  (define (env-loop env)
+    (if (eq? env the-empty-environment)
+        (error "Unbound variable" var))
+    (let* ((frame (first-frame env))
+           (lookup-val (assoc var frame)))
+      (if lookup-val
+          (let ((val (cadr lookup-val)))
+            (if (eq? val '*unassigned*)
+                (error "Unassigned variable")
+                val))
+          (env-loop (enclosing-environment env)))))
+  (env-loop env))
+
+(define (defines->let defines)
+  (map (lambda (x) (list (definition-variable x) '(quote *unassigned*))) defines))
+
+(define (defines->set defines)
+  (map (lambda (x) (list 'set! (definition-variable x) (definition-value x))) defines))
+
+(define (scan-out-defines body)
+  (let* ((defines (filter definition? body))
+         (others (filter (lambda (x) (not (definition? x))) body))
+         (let-exps (defines->let defines))
+         (set-exps (defines->set defines)))
+    (if (null? defines)
+       body
+       (list (make-let let-exps (make-begin (append set-exps others)))))
+))
+
+(define (make-procedure parameters body env)
+  (list 'procedure parameters (scan-out-defines body) env))
+
+; ---- Exercise 4.20 ----
+(define (letrec-exps exp)
+  (let ((bindings (let-bindings exp)))
+    (map (lambda (x) (list (car x) '(quote *unassigned))) bindings)))
+(define (letrec-sets exp)
+  (let ((bindings (let-bindings exp)))
+    (map (lambda (x) (list 'set! (car x) (cadr x))) bindings)))
+
+(define (letrec->let exp)
+  (make-let (letrec-exps exp) (make-begin (append (letrec-sets exp) (list (let-body exp))))))
+(put-syntax! 'letrec (lambda (exp env) (eval (letrec->let exp) env)))
+
+; ---- Exercise 4.20 ----
+(define (unless->if exp)
+  (make-if (if-predicate exp) (if-alternative exp) (if-consequent exp))) 
+(put-syntax! 'unless (lambda (exp env)(eval (unless->if exp) env)))
+
 (load "tests.scm")
 (run-tests)
+
