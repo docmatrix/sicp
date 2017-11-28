@@ -8,3 +8,12 @@
         (require (> high low))
         (amb low (an-integer-between (+ low 1) high))))
 
+(driver-loop)
+; (an-integer-between 0 5)
+; try-again
+; try-again
+; try-again
+; try-again
+; try-again
+; try-again - EOF
+
